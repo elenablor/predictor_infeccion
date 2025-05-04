@@ -1,10 +1,10 @@
-
 from flask import Flask, render_template, request
 import numpy as np
 import joblib
 from tensorflow.keras.models import load_model
 import pandas as pd
 from predict import hacer_prediccion
+import os  # <--- importante para leer el puerto de Render
 
 app = Flask(__name__)
 
@@ -24,4 +24,5 @@ def index():
     return render_template("index.html", columns=columns, prediction=prediction)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+
