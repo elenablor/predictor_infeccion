@@ -99,11 +99,16 @@
 
         </form>
 
-        {% if prediction is not none %}
+        {% if prediction == 'error' %}
+        <div class="alert alert-warning mt-4">
+            No se ha podido calcular el riesgo. Revisa que todos los campos estén correctamente rellenados.
+        </div>
+        {% elif prediction is not none %}
         <div class="alert mt-4 {{ 'alert-danger' if prediction == 1 else 'alert-success' }}">
             Riesgo de infección: <strong>{{ 'ALTO' if prediction == 1 else 'BAJO' }}</strong>
         </div>
         {% endif %}
+        
 
     </div>
 </body>
