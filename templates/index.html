@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
     <div class="container mt-5">
-        <h2 class="mb-4 text-center">Formulario de Predicción</h2>
+        <h2 class="mb-4 text-center">Predicción de riesgo de infección</h2>
         <form method="post" class="card p-4 shadow">
 
             <div class="mb-3">
@@ -20,6 +20,14 @@
                 <select class="form-select" name="Sexo" required>
                     <option value="0">Mujer</option>
                     <option value="1">Hombre</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tipo de prótesis implantada</label>
+                <select class="form-select" name="PROCED" required>
+                    <option value="1">Prótesis de cadera</option>
+                    <option value="2">Prótesis de rodilla</option>
                 </select>
             </div>
 
@@ -47,41 +55,45 @@
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Código de procedimiento</label>
-                <input type="number" class="form-control" name="PROCED" required>
-            </div>
-
-            <div class="mb-3">
                 <label class="form-label">Quirófano</label>
-                <select class="form-select" name="Quirófano_1.0" required>
+                <select class="form-select" name="QUIROFANO" required>
                     <option value="1">Quirófano 1</option>
-                    <option value="0">Otro</option>
+                    <option value="2">Quirófano 2</option>
+                    <option value="3">Quirófano 3</option>
+                    <option value="4">Quirófano 4</option>
+                    <option value="5">Quirófano 5</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">ASA (riesgo anestésico)</label>
-                <select class="form-select" name="Proc.ASA_1" required>
-                    <option value="1">ASA 1</option>
-                    <option value="0">Otro</option>
+                <label class="form-label">Clasificación ASA (riesgo anestésico)</label>
+                <select class="form-select" name="ASA" required>
+                    <option value="1">ASA I – Paciente sano</option>
+                    <option value="2">ASA II – Enfermedad sistémica leve</option>
+                    <option value="3">ASA III – Enfermedad sistémica grave</option>
+                    <option value="4">ASA IV – Enfermedad grave que amenaza la vida</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Valoración de profilaxis</label>
-                <select class="form-select" name="ValoraciónProfilaxis_Adecuada/Aprobada" required>
-                    <option value="1">Adecuada</option>
-                    <option value="0">Otra</option>
+                <label class="form-label">Profilaxis antibiótica (tipo)</label>
+                <select class="form-select" name="PROFILAXIS" required>
+                    <option value="Adecuada/Aprobada">Adecuada: antibiótico correcto y a tiempo</option>
+                    <option value="Inadecuada por inicio">Inadecuada por inicio: fuera del tiempo recomendado</option>
+                    <option value="Inadecuada por elección">Inadecuada por elección: antibiótico incorrecto</option>
+                    <option value="No administrada">No administrada</option>
                 </select>
             </div>
-
+            
             <div class="mb-3">
                 <label class="form-label">Grado de contaminación quirúrgica</label>
-                <select class="form-select" name="GradoContaminación_Limpia" required>
-                    <option value="1">Limpia</option>
-                    <option value="0">Otra</option>
+                <select class="form-select" name="CONTAMINACION" required>
+                    <option value="Limpia">Limpia – Sin infección, técnica estéril mantenida</option>
+                    <option value="Contaminada">Contaminada – Técnica estéril comprometida o heridas abiertas</option>
+                    <option value="Sucia">Sucia – Infección activa presente antes de la cirugía</option>
                 </select>
             </div>
+
 
             <button type="submit" class="btn btn-primary w-100">Predecir Riesgo</button>
 
