@@ -5,63 +5,48 @@ from tensorflow.keras.models import load_model
 import pandas as pd
 import os
 
-from predict import hacer_prediccion
-
 app = Flask(__name__)
 
 # Cargar modelo y scaler
 model = load_model("model_mlp.h5")
 scaler = joblib.load("scaler.pkl")
 
-# Columnas que espera el modelo (sin ILQ)
+# Cargar columnas del CSV de referencia
 columns = pd.read_csv("datos_preinfeccion_limpios.csv", sep=";", encoding="ISO-8859-1").drop("ILQ", axis=1).columns.tolist()
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     prediction = None
     if request.method == "POST":
-        form_data = request.form.to_dict()
-
-        # ===== QUIRÓFANO (one-hot) =====
-        for i in range(1, 6):
-            form_data[f"Quirófano_{i}.0"] = 1 if form_data["QUIROFANO"] == str(i) else 0
-        del form_data["QUIROFANO"]
-
-        # ===== ASA (one-hot) =====
-        for i in range(1, 5):
-            form_data[f"Proc.ASA_{i}"] = 1 if form_data["ASA"] == str(i) else 0
-        del form_data["ASA"]
-
-        # ===== PROFILAXIS (one-hot) =====
-        tipos_profilaxis = [
-            "Adecuada/Aprobada",
-            "Inadecuada por inicio",
-            "Inadecuada por elección",
-            "No administrada"
-        ]
-        for tipo in tipos_profilaxis:
-            key = f"ValoraciónProfilaxis_{tipo}"
-            form_data[key] = 1 if form_data["PROFILAXIS"] == tipo else 0
-        del form_data["PROFILAXIS"]
-
-        # ===== CONTAMINACIÓN (one-hot) =====
-        grados_contaminacion = ["Limpia", "Contaminada", "Sucia"]
-        for grado in grados_contaminacion:
-            key = f"GradoContaminación_{grado}"
-            form_data[key] = 1 if form_data["CONTAMINACION"] == grado else 0
-        del form_data["CONTAMINACION"]
-
-        # ===== Convertir valores a float y ordenar según columnas esperadas =====
         try:
-            datos_usuario = [float(form_data[col]) for col in columns]
-            prediction = hacer_prediccion(np.array([datos_usuario]), scaler, model)
+            # Recoger y transformar inputs del formulario
+            inputs = {
+                "EDAD": float(request.form["EDAD"]),
+                "Sexo": float(request.form["Sexo"]),
+                "PROCED": 1.0 if request.form["PROCED"] == "1" else 2.0,
+                "Proc.Duración": float(request.form["Proc.Duración"]),
+                "Proc.Esreintervención": float(request.form["Proc.Esreintervención"]),
+                "TipoIntervención": float(request.form["TipoIntervención"]),
+                "Quirófano_1.0": 1.0 if request.form["QUIROFANO"] == "1" else 0.0,
+                "Proc.ASA_1": 1.0 if request.form["ASA"] == "1" else 0.0,
+                "ValoraciónProfilaxis_Adecuada/Aprobada": 1.0 if request.form["PROFILAXIS"] == "Adecuada/Aprobada" else 0.0,
+                "GradoContaminación_Limpia": 1.0 if request.form["CONTAMINACION"] == "Limpia" else 0.0
+            }
+
+            # Crear vector ordenado según columnas esperadas
+            datos_ordenados = [inputs[col] for col in columns]
+
+            # Escalar e inferir
+            x = scaler.transform([datos_ordenados])
+            pred = model.predict(x)[0][0]
+            prediction = 1 if pred >= 0.5 else 0
+
         except Exception as e:
-            print(f"Error durante la predicción: {e}")
+            print("ERROR:", e)
             prediction = "error"
 
     return render_template("index.html", columns=columns, prediction=prediction)
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
