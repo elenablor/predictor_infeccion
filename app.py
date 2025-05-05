@@ -8,7 +8,7 @@ import os
 app = Flask(__name__)
 
 # Cargar modelo y scaler
-model = load_model("modelo_entrenado.keras")
+model = load_model("modelo_entrenado.h5")
 scaler = joblib.load("scaler.pkl")
 
 # Cargar columnas del CSV de referencia
